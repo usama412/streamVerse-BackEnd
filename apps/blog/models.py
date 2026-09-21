@@ -1,0 +1,3 @@
+from django.conf import settings
+from django.db import models
+class BlogPost(models.Model): slug=models.SlugField(unique=True); title=models.CharField(max_length=255); excerpt=models.TextField(); content=models.TextField(); image=models.URLField(blank=True); category=models.CharField(max_length=80); author=models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True,on_delete=models.SET_NULL); read_time=models.CharField(max_length=30,blank=True); tags=models.JSONField(default=list); published=models.BooleanField(default=True); published_at=models.DateTimeField(null=True,blank=True); created_at=models.DateTimeField(auto_now_add=True); updated_at=models.DateTimeField(auto_now=True)
