@@ -4,26 +4,27 @@ from datetime import timedelta
 
 from dotenv import load_dotenv
 
-# ---------------------------------------------------------
+
+# =========================================================
 # BASE CONFIGURATION
-# ---------------------------------------------------------
+# =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env locally
 load_dotenv(BASE_DIR / ".env")
 
 
-# ---------------------------------------------------------
+# =========================================================
 # SECURITY
-# ---------------------------------------------------------
+# =========================================================
 
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
-    "unsafe-dev-key-change-this-in-production",
+    "unsafe-dev-key",
 )
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -35,9 +36,9 @@ ALLOWED_HOSTS = [
 ]
 
 
-# ---------------------------------------------------------
-# APPLICATIONS
-# ---------------------------------------------------------
+# =========================================================
+# INSTALLED APPS
+# =========================================================
 
 INSTALLED_APPS = [
     # Django
@@ -48,14 +49,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Third-party
+    # Third Party
     "corsheaders",
     "rest_framework",
     "django_filters",
     "drf_spectacular",
     "rest_framework_simplejwt.token_blacklist",
 
-    # Local apps
+    # Project Apps
     "apps.accounts",
     "apps.catalog",
     "apps.library",
@@ -66,9 +67,9 @@ INSTALLED_APPS = [
 ]
 
 
-# ---------------------------------------------------------
+# =========================================================
 # MIDDLEWARE
-# ---------------------------------------------------------
+# =========================================================
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -89,18 +90,23 @@ MIDDLEWARE = [
 ]
 
 
-# ---------------------------------------------------------
-# URL / WSGI
-# ---------------------------------------------------------
+# =========================================================
+# URL CONFIGURATION
+# =========================================================
 
 ROOT_URLCONF = "config.urls"
+
+
+# =========================================================
+# WSGI
+# =========================================================
 
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # TEMPLATES
-# ---------------------------------------------------------
+# =========================================================
 
 TEMPLATES = [
     {
@@ -123,39 +129,27 @@ TEMPLATES = [
 ]
 
 
-# ---------------------------------------------------------
+# =========================================================
 # DATABASE
-# ---------------------------------------------------------
-#
-# Render:
-#   Uses DATABASE_URL
-#
-# Local:
-#   Uses POSTGRES_* variables
-#
-# ---------------------------------------------------------
+# =========================================================
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+
 if DATABASE_URL:
-    try:
-        import dj_database_url
 
-        DATABASES = {
-            "default": dj_database_url.parse(
-                DATABASE_URL,
-                conn_max_age=600,
-                ssl_require=True,
-            )
-        }
+    import dj_database_url
 
-    except ImportError:
-        raise ImportError(
-            "dj-database-url is required when DATABASE_URL is used. "
-            "Install it with: pip install dj-database-url"
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
         )
+    }
 
 else:
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -167,12 +161,12 @@ else:
 
             "USER": os.getenv(
                 "POSTGRES_USER",
-                "streamverse",
+                "postgres",
             ),
 
             "PASSWORD": os.getenv(
                 "POSTGRES_PASSWORD",
-                "streamverse",
+                "",
             ),
 
             "HOST": os.getenv(
@@ -188,48 +182,47 @@ else:
     }
 
 
-# ---------------------------------------------------------
+# =========================================================
 # CUSTOM USER MODEL
-# ---------------------------------------------------------
+# =========================================================
 
 AUTH_USER_MODEL = "accounts.User"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # PASSWORD VALIDATION
-# ---------------------------------------------------------
+# =========================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": (
+        "NAME":
             "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
-        ),
+            "UserAttributeSimilarityValidator",
     },
+
     {
-        "NAME": (
+        "NAME":
             "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
+            "MinimumLengthValidator",
     },
+
     {
-        "NAME": (
+        "NAME":
             "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
+            "CommonPasswordValidator",
     },
+
     {
-        "NAME": (
+        "NAME":
             "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
-        ),
+            "NumericPasswordValidator",
     },
 ]
 
 
-# ---------------------------------------------------------
+# =========================================================
 # INTERNATIONALIZATION
-# ---------------------------------------------------------
+# =========================================================
 
 LANGUAGE_CODE = "en-us"
 
@@ -240,34 +233,34 @@ USE_I18N = True
 USE_TZ = True
 
 
-# ---------------------------------------------------------
+# =========================================================
 # STATIC FILES
-# ---------------------------------------------------------
+# =========================================================
 
 STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # MEDIA FILES
-# ---------------------------------------------------------
+# =========================================================
 
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # DEFAULT PRIMARY KEY
-# ---------------------------------------------------------
+# =========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# ---------------------------------------------------------
+# =========================================================
 # CORS
-# ---------------------------------------------------------
+# =========================================================
 
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
@@ -279,9 +272,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-# ---------------------------------------------------------
+# =========================================================
 # CSRF
-# ---------------------------------------------------------
+# =========================================================
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
@@ -293,11 +286,12 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-# ---------------------------------------------------------
-# REST FRAMEWORK
-# ---------------------------------------------------------
+# =========================================================
+# DJANGO REST FRAMEWORK
+# =========================================================
 
 REST_FRAMEWORK = {
+
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -308,27 +302,28 @@ REST_FRAMEWORK = {
 
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
+
         "rest_framework.filters.SearchFilter",
+
         "rest_framework.filters.OrderingFilter",
     ),
 
-    "DEFAULT_SCHEMA_CLASS": (
-        "drf_spectacular.openapi.AutoSchema"
-    ),
+    "DEFAULT_SCHEMA_CLASS":
+        "drf_spectacular.openapi.AutoSchema",
 
-    "DEFAULT_PAGINATION_CLASS": (
-        "rest_framework.pagination.PageNumberPagination"
-    ),
+    "DEFAULT_PAGINATION_CLASS":
+        "rest_framework.pagination.PageNumberPagination",
 
     "PAGE_SIZE": 20,
 }
 
 
-# ---------------------------------------------------------
+# =========================================================
 # JWT
-# ---------------------------------------------------------
+# =========================================================
 
 SIMPLE_JWT = {
+
     "ACCESS_TOKEN_LIFETIME": timedelta(
         minutes=int(
             os.getenv(
@@ -357,14 +352,16 @@ SIMPLE_JWT = {
 }
 
 
-# ---------------------------------------------------------
-# DRF SPECTACULAR / SWAGGER
-# ---------------------------------------------------------
+# =========================================================
+# API DOCUMENTATION
+# =========================================================
 
 SPECTACULAR_SETTINGS = {
+
     "TITLE": "StreamVerse API",
 
-    "DESCRIPTION": "Streaming platform backend API",
+    "DESCRIPTION":
+        "Streaming platform backend API",
 
     "VERSION": "1.0.0",
 
@@ -372,9 +369,9 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-# ---------------------------------------------------------
+# =========================================================
 # EMAIL
-# ---------------------------------------------------------
+# =========================================================
 
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
@@ -417,9 +414,9 @@ DEFAULT_FROM_EMAIL = os.getenv(
 )
 
 
-# ---------------------------------------------------------
+# =========================================================
 # FRONTEND
-# ---------------------------------------------------------
+# =========================================================
 
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
@@ -427,9 +424,9 @@ FRONTEND_URL = os.getenv(
 )
 
 
-# ---------------------------------------------------------
+# =========================================================
 # CELERY / REDIS
-# ---------------------------------------------------------
+# =========================================================
 
 CELERY_BROKER_URL = os.getenv(
     "REDIS_URL",
@@ -450,11 +447,12 @@ CELERY_TASK_ALWAYS_EAGER = (
 )
 
 
-# ---------------------------------------------------------
+# =========================================================
 # PRODUCTION SECURITY
-# ---------------------------------------------------------
+# =========================================================
 
 if not DEBUG:
+
     SECURE_PROXY_SSL_HEADER = (
         "HTTP_X_FORWARDED_PROTO",
         "https",
@@ -463,8 +461,6 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
 
     CSRF_COOKIE_SECURE = True
-
-    SECURE_BROWSER_XSS_FILTER = True
 
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
